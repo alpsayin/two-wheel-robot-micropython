@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"autoHide.autoHidePanel": false,
+		"autoHide.autoHideSideBar": false
+	}
+}
