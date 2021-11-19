@@ -185,6 +185,34 @@ def init_heartbeat_timer():
     )
 
 
+def print_help():
+    print('# boot.py script defines easy-to-type shorthands for robot control')
+    print('')
+    print('robot_backward as b')
+    print('robot_forward as f')
+    print('robot_rotate_left as rl')
+    print('robot_rotate_right as rr')
+    print('robot_turn_left as tl')
+    print('robot_turn_right as tr')
+    print('robot_wait as rw')
+    print('robot_wait_1s as rw1')
+    print('robot_wait_5s as rw5')
+    print('execute_cmds as ec')
+    print('print_status')
+    print('print_help')
+    print('print_help as robot_help')
+    print('')
+    print('# You can issue multiple commands like below:')
+    print('f(), rl(), rl(), rl(), b(), b()')
+    print('# Or you can use the ec shorthand:')
+    print('ec(f, rw1, rl, rw, rl, rw, rl, rw5, b, b)')
+    print('')
+    print('# You can even use the ec shorthand with threading:')
+    print('from _thread import start_new_thread as snt')
+    print('snt(ec, (f, rl, rl, rl, rw1, b, b,))')
+    print('')
+
+
 def main_init():
     global status_dict
     init_gpio()
@@ -202,17 +230,8 @@ def main_init():
     init_heartbeat_timer()
 
     print('\nPress CTRL-C to drop to REPL to control the robot with existing functions\n')  # noqa E501
-    print('# boot.py script defines easy-to-type shorthands for robot control')
-    print('')
-    print('# You can issue multiple commands like below:')
-    print('f(), rl(), rl(), rl(), b(), b()')
-    print('# Or you can use the ec shorthand:')
-    print('ec(f, rw1, rl, rw, rl, rw, rl, rw5, b, b)')
-    print('')
-    print('# You can even use the ec shorthand with threading:')
-    print('from _thread import start_new_thread as snt')
-    print('snt(ec, (f, rl, rl, rl, rw1, b, b,))')
-    print('')
+
+    print_help()
 
 
 def heartbeat_task():
