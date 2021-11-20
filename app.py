@@ -27,7 +27,7 @@ in3 = PWM(pin3, freq=10, duty=0)
 pin4 = Pin(14, Pin.OUT)
 in4 = PWM(pin4, freq=10, duty=0)
 pins = [in1, in2, in3, in4]
-power_level = 1.0
+power_level = 0.75
 
 # status
 heartbeat_timer_flag = True
