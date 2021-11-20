@@ -1,3 +1,4 @@
+from machine import reset  # noqa F401
 import webrepl
 
 print('boot.py')
