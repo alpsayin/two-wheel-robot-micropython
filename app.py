@@ -5,6 +5,7 @@ from micropython import const
 import gc
 import repl_drop
 import wlan_wrapper
+from MicroWebSrv2 import *
 
 BOOT_TIME = const(3)
 HEARTBEAT_PERIOD = const(2000)  # ms
@@ -134,24 +135,100 @@ def robot_wait_5s():
     time.sleep_ms(5000)
 
 
-def execute_cmds(*args):
-    valid_cmds = [robot_forward,
-                  robot_backward,
-                  robot_rotate_left,
-                  robot_rotate_right,
-                  robot_turn_left,
-                  robot_turn_right,
-                  robot_wait,
-                  robot_wait_1s,
-                  robot_wait_5s
-                  ]
-    # print(args)
+valid_cmds = [robot_stop,
+              robot_forward,
+              robot_backward,
+              robot_rotate_left,
+              robot_rotate_right,
+              robot_turn_left,
+              robot_turn_right,
+              robot_wait,
+              robot_wait_1s,
+              robot_wait_5s,
+              robot_set_power,
+              robot_get_power
+              ]
 
+valid_cmd_dict = {cmd.__name__: cmd for cmd in valid_cmds}
+# print(valid_cmd_dict)
+
+
+def execute_cmds(*args):
     for arg in args:
         # print(arg)
         if arg in valid_cmds:
             print('Executing {}'.format(arg.__name__))
             arg()
+
+
+def render_control_form(request, previous_form=None):
+    if previous_form is None:
+        robot_function_val = ''
+        param_val = ''
+    else:
+        robot_function_val = previous_form['robot_function']
+        param_val = previous_form['param']
+    content = """\
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <title>micropython robot control</title>
+        </head>
+        <body>
+            <h2>micropython robot control</h2>
+            User address: %s<br />
+            <form action="/robot_control" method="post">
+                Function:   <input type="text" name="robot_function" value="%s"><br />
+                Parameter:  <input type="text" name="param" value="%s"><br />
+                <input type="submit" value="OK">
+            </form>
+        </body>
+    </html>
+    """ % (request.UserAddress[0], robot_function_val, param_val)
+    return content
+
+
+@WebRoute(GET, '/robot_control')
+def RequestTestRedirect(microWebSrv2, request):
+    content = render_control_form(request)
+    request.Response.ReturnOk(content)
+
+
+@WebRoute(POST, '/robot_control', name='robot_control')
+def RequestTestPost(microWebSrv2, request):
+    data = request.GetPostedURLEncodedForm()
+    print(data)
+    result = None
+    try:
+        robot_function_name = str(data['robot_function'])
+        print(robot_function_name)
+        if robot_function_name in valid_cmd_dict:
+            robot_function = valid_cmd_dict[robot_function_name]
+            print(robot_function)
+    except:
+        request.Response.ReturnBadRequest()
+        return
+    robot_function_param = None
+    try:
+        robot_function_param = int(data['param'])
+        print(robot_function_param)
+    except:
+        pass
+    if robot_function_param:
+        result = robot_function(robot_function_param)
+    else:
+        result = robot_function()
+
+    # content = """\
+    # {\"success\" : \"true\", \"result\" : \"%s\"}
+    # """ % (result)
+    content = render_control_form(request, previous_form=data)
+    request.Response.ReturnOk(content)
+
+
+mws2 = MicroWebSrv2()
+mws2.SetEmbeddedConfig()
+mws2.StartManaged()
 
 
 def get_pin_status():
@@ -260,10 +337,14 @@ def main():
     repl_drop.wait(BOOT_TIME)
     print('app.py')
     main_init()
-    while True:
-        # Periodic Heartbeat Task
-        if heartbeat_timer_flag:
-            heartbeat_timer_flag = False
-            heartbeat_task()
+    try:
+        while True:
+            # Periodic Heartbeat Task
+            if heartbeat_timer_flag:
+                heartbeat_timer_flag = False
+                heartbeat_task()
 
-        time.sleep(0.005)
+            time.sleep(0.005)
+    except KeyboardInterrupt:
+        print('Caught CTRL-C')
+        pass

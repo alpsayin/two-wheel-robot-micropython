@@ -5,3 +5,4 @@ pymakr.conf
 .vscode/*
 .directory
 *credentials.py
+MicroWebSrv2/
