@@ -54,6 +54,7 @@ def set_power(new_power_level):
     power_level = new_power_level
 
 
+def robot_stop():
     in1.duty(0)
     in2.duty(0)
     in3.duty(0)
@@ -67,7 +68,7 @@ def robot_forward(duration_ms=DEFAULT_MOTION_DURATION_MS):
     in4.duty(0)
     if duration_ms != -1:
         time.sleep_ms(duration_ms)
-    stop()
+    robot_stop()
 
 
 def robot_backward(duration_ms=DEFAULT_MOTION_DURATION_MS):
@@ -77,7 +78,7 @@ def robot_backward(duration_ms=DEFAULT_MOTION_DURATION_MS):
     in4.duty(int(1023*power_level))
     if duration_ms != -1:
         time.sleep_ms(duration_ms)
-    stop()
+    robot_stop()
 
 
 def robot_rotate_right(duration_ms=DEFAULT_ROTATE_DURATION_MS):
@@ -87,7 +88,7 @@ def robot_rotate_right(duration_ms=DEFAULT_ROTATE_DURATION_MS):
     in4.duty(0)
     if duration_ms != -1:
         time.sleep_ms(duration_ms)
-    stop()
+    robot_stop()
 
 
 def robot_rotate_left(duration_ms=DEFAULT_ROTATE_DURATION_MS):
@@ -97,7 +98,7 @@ def robot_rotate_left(duration_ms=DEFAULT_ROTATE_DURATION_MS):
     in4.duty(int(1023*power_level))
     if duration_ms != -1:
         time.sleep_ms(duration_ms)
-    stop()
+    robot_stop()
 
 
 def robot_turn_right(duration_ms=DEFAULT_ROTATE_DURATION_MS):
@@ -107,7 +108,7 @@ def robot_turn_right(duration_ms=DEFAULT_ROTATE_DURATION_MS):
     in4.duty(0)
     if duration_ms != -1:
         time.sleep_ms(duration_ms)
-    stop()
+    robot_stop()
 
 
 def robot_turn_left(duration_ms=DEFAULT_ROTATE_DURATION_MS):
@@ -117,7 +118,7 @@ def robot_turn_left(duration_ms=DEFAULT_ROTATE_DURATION_MS):
     in4.duty(0)
     if duration_ms != -1:
         time.sleep_ms(duration_ms)
-    stop()
+    robot_stop()
 
 
 def robot_wait(duration_ms=DEFAULT_MOTION_DURATION_MS):
