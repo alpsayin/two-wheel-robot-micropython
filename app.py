@@ -1,6 +1,6 @@
 import machine
 import time
-from machine import Timer, Pin
+from machine import Timer, Pin, PWM
 from micropython import const
 import gc
 import repl_drop
@@ -9,7 +9,7 @@ import wlan_wrapper
 BOOT_TIME = const(3)
 HEARTBEAT_PERIOD = const(2000)  # ms
 DEFAULT_MOTION_DURATION_MS = const(500)  # ms
-DEFAULT_ROTATE_DURATION_MS = const(100)  # ms
+DEFAULT_ROTATE_DURATION_MS = const(200)  # ms
 
 # wifi
 # make sure you have a credentials.py file which defines the below variables
@@ -17,11 +17,16 @@ from credentials import WLAN_SSID, WLAN_KEY  # noqa E402
 DHCP_HOSTNAME = 'alpo'
 
 # motor control pins
-in1 = Pin(25, Pin.OUT)
-in2 = Pin(26, Pin.OUT)
-in3 = Pin(27, Pin.OUT)
-in4 = Pin(14, Pin.OUT)
+pin1 = Pin(25, Pin.OUT)
+in1 = PWM(pin1, freq=10, duty=0)
+pin2 = Pin(26, Pin.OUT)
+in2 = PWM(pin2, freq=10, duty=0)
+pin3 = Pin(27, Pin.OUT)
+in3 = PWM(pin3, freq=10, duty=0)
+pin4 = Pin(14, Pin.OUT)
+in4 = PWM(pin4, freq=10, duty=0)
 pins = [in1, in2, in3, in4]
+power_level = 1.0
 
 # status
 heartbeat_timer_flag = True
@@ -41,69 +46,77 @@ publish_timer = Timer(-2)
 # capture buffer
 capture_buffer = bytearray()
 
+def get_power():
+    global power_level
+    return power_level
 
-def stop():
-    in1.off()
-    in2.off()
-    in3.off()
-    in4.off()
+
+def set_power(new_power_level):
+    global power_level
+    power_level = new_power_level
+
+
+    in1.duty(0)
+    in2.duty(0)
+    in3.duty(0)
+    in4.duty(0)
 
 
 def robot_forward(duration_ms=DEFAULT_MOTION_DURATION_MS):
-    in1.on()
-    in2.off()
-    in3.on()
-    in4.off()
+    in1.duty(int(1023*power_level))
+    in2.duty(0)
+    in3.duty(int(1023*power_level))
+    in4.duty(0)
     if duration_ms != -1:
         time.sleep_ms(duration_ms)
     stop()
 
 
 def robot_backward(duration_ms=DEFAULT_MOTION_DURATION_MS):
-    in1.off()
-    in2.on()
-    in3.off()
-    in4.on()
+    in1.duty(0)
+    in2.duty(int(1023*power_level))
+    in3.duty(0)
+    in4.duty(int(1023*power_level))
     if duration_ms != -1:
         time.sleep_ms(duration_ms)
     stop()
 
 
 def robot_rotate_right(duration_ms=DEFAULT_ROTATE_DURATION_MS):
-    in1.off()
-    in2.on()
-    in3.on()
-    in4.off()
+    in1.duty(0)
+    in2.duty(int(1023*power_level))
+    in3.duty(int(1023*power_level))
+    in4.duty(0)
     if duration_ms != -1:
         time.sleep_ms(duration_ms)
     stop()
 
 
 def robot_rotate_left(duration_ms=DEFAULT_ROTATE_DURATION_MS):
-    in1.on()
-    in2.off()
-    in3.off()
-    in4.on()
+    in1.duty(int(1023*power_level))
+    in2.duty(0)
+    in3.duty(0)
+    in4.duty(int(1023*power_level))
     if duration_ms != -1:
         time.sleep_ms(duration_ms)
     stop()
 
 
 def robot_turn_right(duration_ms=DEFAULT_ROTATE_DURATION_MS):
-    in1.off()
-    in2.off()
-    in3.on()
-    in4.off()
+    in1.duty(0)
+    in2.duty(0)
+    in3.duty(int(1023*power_level))
+    in4.duty(0)
     if duration_ms != -1:
         time.sleep_ms(duration_ms)
     stop()
 
 
 def robot_turn_left(duration_ms=DEFAULT_ROTATE_DURATION_MS):
-    in1.on()
-    in2.off()
-    in3.off()
-    in4.off()
+    in1.duty(int(1023*power_level))
+    in2.duty(0)
+    in3.duty(0)
+    in4.duty(0)
     if duration_ms != -1:
         time.sleep_ms(duration_ms)
     stop()
@@ -145,7 +158,7 @@ def get_pin_status():
     global pins
     pin_str = ''
     for pin in pins:
-        pin_str = pin_str + '{:x}'.format(pin.value())
+        pin_str = pin_str + '+{:.2f}'.format(pin.duty()/1023.0)
     return pin_str
 
 
@@ -160,10 +173,14 @@ def prepare_status_string():
 
 def init_gpio():
     global in1, in2, in3, in4
-    in1.off()
-    in2.off()
-    in3.off()
-    in4.off()
+    pin1.value(0)
+    pin2.value(0)
+    pin3.value(0)
+    pin4.value(0)
+    in1.duty(0)
+    in2.duty(0)
+    in3.duty(0)
+    in4.duty(0)
 
 
 def print_status():
