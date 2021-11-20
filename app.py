@@ -44,12 +44,12 @@ publish_period = 5  # seconds
 publish_timer = Timer(-2)
 
 
-def get_power():
+def robot_get_power():
     global power_level
     return power_level
 
 
-def set_power(new_power_level):
+def robot_set_power(new_power_level):
     global power_level
     power_level = new_power_level
 
