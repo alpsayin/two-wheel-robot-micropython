@@ -43,8 +43,6 @@ publish_timer_flag = False
 publish_period = 5  # seconds
 publish_timer = Timer(-2)
 
-# capture buffer
-capture_buffer = bytearray()
 
 def get_power():
     global power_level
