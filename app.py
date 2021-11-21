@@ -325,7 +325,8 @@ def main_init():
 
 
 def heartbeat_task():
-    print_status()
+    # print_status()
+    pass
 
 
 def main():
