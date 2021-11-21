@@ -3,15 +3,21 @@ import time
 from machine import Timer, Pin, PWM
 from micropython import const
 import gc
-import repl_drop
 import wlan_wrapper
-from MicroWebSrv2 import *
+from _thread import allocate_lock, start_new_thread
+import json
 
 
 BOOT_TIME = const(3)
 HEARTBEAT_PERIOD = const(5)  # s
 DEFAULT_MOTION_DURATION_MS = const(500)  # ms
 DEFAULT_ROTATE_DURATION_MS = const(200)  # ms
+
+import repl_drop
+repl_drop.wait(BOOT_TIME)
+print('app.py')
+
+from MicroWebSrv2 import *
 
 # wifi
 # make sure you have a credentials.py file which defines the below variables
@@ -269,7 +275,7 @@ def heartbeat_callback(timer_obj):
 
 def init_heartbeat_timer():
     heartbeat.init(
-        period=HEARTBEAT_PERIOD*1000,
+        period=HEARTBEAT_PERIOD * 1000,
         mode=Timer.PERIODIC,
         callback=heartbeat_callback
     )
@@ -307,6 +313,8 @@ def main_init():
     global status_dict
     init_gpio()
 
+    print_help()
+
     init_wlan_result = wlan_wrapper.init_wifi(
         WLAN_SSID,
         WLAN_KEY,
@@ -321,8 +329,6 @@ def main_init():
 
     print('\nPress CTRL-C to drop to REPL to control the robot with existing functions\n')  # noqa E501
 
-    print_help()
-
 
 def heartbeat_task():
     # print_status()
@@ -331,8 +337,6 @@ def heartbeat_task():
 
 def main():
     global heartbeat_timer_flag, publish_timer_flag, status_dict
-    repl_drop.wait(BOOT_TIME)
-    print('app.py')
     main_init()
     try:
         while True:
