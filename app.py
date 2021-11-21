@@ -164,73 +164,120 @@ def execute_cmds(*cmds):
             cmd_queue.append((cmd, None, None))
 
 
-def render_control_form(request, previous_form=None):
-    if previous_form is None:
-        robot_function_val = ''
-        param_val = ''
+def websocket_on_accept(microWebSrv2, webSocket):
+    print('Example WebSocket accepted:')
+    print('   - User   : %s:%s' % webSocket.Request.UserAddress)
+    print('   - Path   : %s' % webSocket.Request.Path)
+    print('   - Origin : %s' % webSocket.Request.Origin)
+    if webSocket.Request.Path.lower() == '/ws_controller':
+        controller_websocket_join(webSocket)
     else:
-        robot_function_val = previous_form['robot_function']
-        param_val = previous_form['param']
-    content = """\
-    <!DOCTYPE html>
-    <html>
-        <head>
-            <title>micropython robot control</title>
-        </head>
-        <body>
-            <h2>micropython robot control</h2>
-            User address: %s<br />
-            <form action="/robot_control" method="post">
-                Function:   <input type="text" name="robot_function" value="%s"><br />
-                Parameter:  <input type="text" name="param" value="%s"><br />
-                <input type="submit" value="OK">
-            </form>
-        </body>
-    </html>
-    """ % (request.UserAddress[0], robot_function_val, param_val)
-    return content
+        print('Uknown ws path: "%s"' % webSocket.Request.Path.lower())
+        webSocket.OnTextMessage = websocket_on_recv_text
+        webSocket.OnBinaryMessage = websocket_on_recv_binary
+        webSocket.OnClosed = websocket_on_close
+
+# ============================================================================
+# ============================================================================
+# ============================================================================
 
 
-@WebRoute(GET, '/robot_control')
-def RequestTestRedirect(microWebSrv2, request):
-    content = render_control_form(request)
-    request.Response.ReturnOk(content)
+def websocket_on_recv_text(webSocket, msg):
+    print('WebSocket text message: %s' % msg)
+    webSocket.SendTextMessage('Received "%s"' % msg)
+
+# ------------------------------------------------------------------------
 
 
-@WebRoute(POST, '/robot_control', name='robot_control')
-def RequestTestPost(microWebSrv2, request):
-    data = request.GetPostedURLEncodedForm()
-    print(data)
-    result = None
-    try:
-        robot_function_name = str(data['robot_function'])
-        print(robot_function_name)
-        if robot_function_name in valid_cmd_dict:
-            robot_function = valid_cmd_dict[robot_function_name]
-            print(robot_function)
-    except:
-        request.Response.ReturnBadRequest()
+def websocket_on_recv_binary(webSocket, msg):
+    print('WebSocket binary message: %s' % msg)
+
+# ------------------------------------------------------------------------
+
+
+def websocket_on_close(webSocket):
+    print('WebSocket %s:%s closed' % webSocket.Request.UserAddress)
+
+# ============================================================================
+# ============================================================================
+# ============================================================================
+
+
+global diff_data_websocket
+diff_data_websocket = None
+
+global _wsLock
+_wsLock = allocate_lock()
+
+# ------------------------------------------------------------------------
+
+
+def controller_websocket_join(webSocket):
+    global diff_data_websocket
+    webSocket.OnTextMessage = controller_websocket_on_recv_text
+    webSocket.OnClosed = controller_websocket_on_close
+    addr = webSocket.Request.UserAddress
+    print('# Websocket join attempt from <%s:%s>' % addr)
+    accepted = True
+    with _wsLock:
+        if diff_data_websocket is None:
+            diff_data_websocket = webSocket
+            diff_data_websocket.SendTextMessage('# HELLO <%s:%s>' % addr)
+        else:
+            webSocket.SendTextMessage('# REJECTED <%s:%s>' % addr)
+            diff_data_websocket.SendTextMessage('# REJECTED <%s:%s>' % addr)
+            webSocket.Close()
+            accepted = False
+    if accepted:
+        print('# ACCEPTED <%s:%s>' % addr)
+    else:
+        print('# REJECTED <%s:%s>' % addr)
+# ------------------------------------------------------------------------
+
+
+def controller_websocket_on_recv_text(webSocket, msg):
+    json_data = json.loads(msg)
+    cmd = None
+    param = None
+    if 'cmd' not in json_data:
         return
-    robot_function_param = None
-    try:
-        robot_function_param = int(data['param'])
-        print(robot_function_param)
-    except:
-        pass
-    if robot_function_param:
-        result = robot_function(robot_function_param)
-    else:
-        result = robot_function()
+    if json_data['cmd'] not in valid_cmd_dict:
+        return
+    cmd = valid_cmd_dict[json_data['cmd']]
+    param = None
+    if 'param' in json_data:
+        param = json_data['param']
+        if param is not None:
+            try:
+                param = int(param)
+            except OSError:
+                pass
+    cmd_queue.append((cmd, param, webSocket))
+    print('%s(%s)' % (cmd.__name__, str(param), ))
 
-    # content = """\
-    # {\"success\" : \"true\", \"result\" : \"%s\"}
-    # """ % (result)
-    content = render_control_form(request, previous_form=data)
-    request.Response.ReturnOk(content)
+# ------------------------------------------------------------------------
 
 
+def controller_websocket_on_close(webSocket):
+    global diff_data_websocket
+    addr = webSocket.Request.UserAddress
+    with _wsLock:
+        if webSocket == diff_data_websocket:
+            diff_data_websocket = None
+            print('# GOODBYE <%s:%s>' % addr)
+
+# ============================================================================
+# ============================================================================
+# ============================================================================
+
+
+# Loads the WebSockets module globally and configure it,
+wsMod = MicroWebSrv2.LoadModule('WebSockets')
+wsMod.OnWebSocketAccepted = websocket_on_accept
 mws2 = MicroWebSrv2()
 mws2.SetEmbeddedConfig()
+# All pages not found will be redirected to the home '/',
+mws2.NotFoundURL = 'https://alpsayin.com'
 mws2.StartManaged()
 
 
@@ -352,6 +399,10 @@ def main():
                     result = cmd(param)
                 else:
                     result = cmd()
+                if websocket:
+                    with _wsLock:
+                        websocket.SendTextMessage(
+                            '{"result":"%s"}' % str(result))
 
             time.sleep(0.005)
     except KeyboardInterrupt:
