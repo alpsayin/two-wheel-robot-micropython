@@ -36,6 +36,7 @@ pin4 = Pin(14, Pin.OUT)
 in4 = PWM(pin4, freq=10, duty=0)
 pins = [in1, in2, in3, in4]
 power_level = 1000  # max is 1023 but we can happily treat this as decipercent
+cmd_queue = []
 
 # status
 heartbeat_timer_flag = True
@@ -155,12 +156,12 @@ valid_cmd_dict = {cmd.__name__: cmd for cmd in valid_cmds}
 # print(valid_cmd_dict)
 
 
-def execute_cmds(*args):
-    for arg in args:
-        # print(arg)
-        if arg in valid_cmds:
-            print('Executing {}'.format(arg.__name__))
-            arg()
+def execute_cmds(*cmds):
+    for cmd in cmds:
+        # print(cmd)
+        if cmd in valid_cmds:
+            print('Queuing {}'.format(cmd.__name__))
+            cmd_queue.append((cmd, None, None))
 
 
 def render_control_form(request, previous_form=None):
@@ -336,7 +337,7 @@ def heartbeat_task():
 
 
 def main():
-    global heartbeat_timer_flag, publish_timer_flag, status_dict
+    global heartbeat_timer_flag, publish_timer_flag, status_dict, cmd_queue
     main_init()
     try:
         while True:
@@ -344,6 +345,13 @@ def main():
             if heartbeat_timer_flag:
                 heartbeat_timer_flag = False
                 heartbeat_task()
+
+            while cmd_queue:
+                cmd, param, websocket = cmd_queue.pop()
+                if param:
+                    result = cmd(param)
+                else:
+                    result = cmd()
 
             time.sleep(0.005)
     except KeyboardInterrupt:
