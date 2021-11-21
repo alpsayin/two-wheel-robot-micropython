@@ -169,7 +169,7 @@ def websocket_on_accept(microWebSrv2, webSocket):
     print('   - User   : %s:%s' % webSocket.Request.UserAddress)
     print('   - Path   : %s' % webSocket.Request.Path)
     print('   - Origin : %s' % webSocket.Request.Origin)
-    if webSocket.Request.Path.lower() == '/ws_controller':
+    if webSocket.Request.Path.lower() == '/controller_ws':
         controller_websocket_join(webSocket)
     else:
         print('Uknown ws path: "%s"' % webSocket.Request.Path.lower())
@@ -203,8 +203,8 @@ def websocket_on_close(webSocket):
 # ============================================================================
 
 
-global diff_data_websocket
-diff_data_websocket = None
+global controller_ws
+controller_ws = None
 
 global _wsLock
 _wsLock = allocate_lock()
@@ -213,19 +213,19 @@ _wsLock = allocate_lock()
 
 
 def controller_websocket_join(webSocket):
-    global diff_data_websocket
+    global controller_ws
     webSocket.OnTextMessage = controller_websocket_on_recv_text
-    webSocket.OnClosed = controller_websocket_on_close
+    webSocket.OnClosed = websocket_on_close
     addr = webSocket.Request.UserAddress
     print('# Websocket join attempt from <%s:%s>' % addr)
     accepted = True
     with _wsLock:
-        if diff_data_websocket is None:
-            diff_data_websocket = webSocket
-            diff_data_websocket.SendTextMessage('# HELLO <%s:%s>' % addr)
+        if controller_ws is None:
+            controller_ws = webSocket
+            controller_ws.SendTextMessage('# HELLO <%s:%s>' % addr)
         else:
             webSocket.SendTextMessage('# REJECTED <%s:%s>' % addr)
-            diff_data_websocket.SendTextMessage('# REJECTED <%s:%s>' % addr)
+            controller_ws.SendTextMessage('# REJECTED <%s:%s>' % addr)
             webSocket.Close()
             accepted = False
     if accepted:
@@ -255,16 +255,8 @@ def controller_websocket_on_recv_text(webSocket, msg):
     cmd_queue.append((cmd, param, webSocket))
     print('%s(%s)' % (cmd.__name__, str(param), ))
 
-# ------------------------------------------------------------------------
 
 
-def controller_websocket_on_close(webSocket):
-    global diff_data_websocket
-    addr = webSocket.Request.UserAddress
-    with _wsLock:
-        if webSocket == diff_data_websocket:
-            diff_data_websocket = None
-            print('# GOODBYE <%s:%s>' % addr)
 
 # ============================================================================
 # ============================================================================
