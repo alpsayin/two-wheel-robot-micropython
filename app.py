@@ -41,11 +41,6 @@ status_dict = dict(
     mem_free=gc.mem_free()
 )
 
-# publish timer
-publish_timer_flag = False
-publish_period = 5  # seconds
-publish_timer = Timer(-2)
-
 
 def robot_get_power():
     global power_level
