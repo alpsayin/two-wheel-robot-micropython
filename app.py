@@ -29,7 +29,7 @@ in3 = PWM(pin3, freq=10, duty=0)
 pin4 = Pin(14, Pin.OUT)
 in4 = PWM(pin4, freq=10, duty=0)
 pins = [in1, in2, in3, in4]
-power_level = 0.75
+power_level = 1000  # max is 1023 but we can happily treat this as decipercent
 
 # status
 heartbeat_timer_flag = True
@@ -60,9 +60,9 @@ def robot_stop():
 
 
 def robot_forward(duration_ms=DEFAULT_MOTION_DURATION_MS):
-    in1.duty(int(1023 * power_level))
+    in1.duty(power_level)
     in2.duty(0)
-    in3.duty(int(1023 * power_level))
+    in3.duty(power_level)
     in4.duty(0)
     if duration_ms != -1:
         time.sleep_ms(duration_ms)
@@ -71,9 +71,9 @@ def robot_forward(duration_ms=DEFAULT_MOTION_DURATION_MS):
 
 def robot_backward(duration_ms=DEFAULT_MOTION_DURATION_MS):
     in1.duty(0)
-    in2.duty(int(1023 * power_level))
+    in2.duty(power_level)
     in3.duty(0)
-    in4.duty(int(1023 * power_level))
+    in4.duty(power_level)
     if duration_ms != -1:
         time.sleep_ms(duration_ms)
     robot_stop()
@@ -81,8 +81,8 @@ def robot_backward(duration_ms=DEFAULT_MOTION_DURATION_MS):
 
 def robot_rotate_right(duration_ms=DEFAULT_ROTATE_DURATION_MS):
     in1.duty(0)
-    in2.duty(int(1023 * power_level))
-    in3.duty(int(1023 * power_level))
+    in2.duty(power_level)
+    in3.duty(power_level)
     in4.duty(0)
     if duration_ms != -1:
         time.sleep_ms(duration_ms)
@@ -90,10 +90,10 @@ def robot_rotate_right(duration_ms=DEFAULT_ROTATE_DURATION_MS):
 
 
 def robot_rotate_left(duration_ms=DEFAULT_ROTATE_DURATION_MS):
-    in1.duty(int(1023 * power_level))
+    in1.duty(power_level)
     in2.duty(0)
     in3.duty(0)
-    in4.duty(int(1023 * power_level))
+    in4.duty(power_level)
     if duration_ms != -1:
         time.sleep_ms(duration_ms)
     robot_stop()
@@ -102,7 +102,7 @@ def robot_rotate_left(duration_ms=DEFAULT_ROTATE_DURATION_MS):
 def robot_turn_right(duration_ms=DEFAULT_ROTATE_DURATION_MS):
     in1.duty(0)
     in2.duty(0)
-    in3.duty(int(1023 * power_level))
+    in3.duty(power_level)
     in4.duty(0)
     if duration_ms != -1:
         time.sleep_ms(duration_ms)
@@ -110,7 +110,7 @@ def robot_turn_right(duration_ms=DEFAULT_ROTATE_DURATION_MS):
 
 
 def robot_turn_left(duration_ms=DEFAULT_ROTATE_DURATION_MS):
-    in1.duty(int(1023 * power_level))
+    in1.duty(power_level)
     in2.duty(0)
     in3.duty(0)
     in4.duty(0)
