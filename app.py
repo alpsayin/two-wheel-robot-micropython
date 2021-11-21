@@ -7,8 +7,9 @@ import repl_drop
 import wlan_wrapper
 from MicroWebSrv2 import *
 
+
 BOOT_TIME = const(3)
-HEARTBEAT_PERIOD = const(2000)  # ms
+HEARTBEAT_PERIOD = const(5)  # s
 DEFAULT_MOTION_DURATION_MS = const(500)  # ms
 DEFAULT_ROTATE_DURATION_MS = const(200)  # ms
 
@@ -263,7 +264,7 @@ def init_gpio():
 def print_status():
     global status_dict
     print(prepare_status_string())
-    status_dict['seconds'] += 1
+    status_dict['seconds'] += HEARTBEAT_PERIOD
 
 
 def heartbeat_callback(timer_obj):
@@ -273,7 +274,7 @@ def heartbeat_callback(timer_obj):
 
 def init_heartbeat_timer():
     heartbeat.init(
-        period=round(HEARTBEAT_PERIOD),
+        period=HEARTBEAT_PERIOD*1000,
         mode=Timer.PERIODIC,
         callback=heartbeat_callback
     )
