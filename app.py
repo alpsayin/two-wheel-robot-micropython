@@ -421,10 +421,6 @@ def print_help():
     print('# Or you can use the ec shorthand:')
     print('ec(f, rw1, rl, rw, rl, rw, rl, rw5, b, b)')
     print('')
-    print('# You can even use the ec shorthand with threading:')
-    print('from _thread import start_new_thread as snt')
-    print('snt(ec, (f, rl, rl, rl, rw1, b, b,))')
-    print('')
 
 
 def main_init():
