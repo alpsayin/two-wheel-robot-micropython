@@ -2,8 +2,11 @@ import time
 import websocket
 from pynput import keyboard
 import simplejson as json
+from argparse import ArgumentParser, ArgumentTypeError
 
-DEFAULT_POWER = 750
+DEFAULT_POWER = 1000
+LOW_POWER = 500
+HOSTNAME = None
 
 motors_ws = None
 
@@ -24,23 +27,23 @@ def compute_motor_speeds():
         motor1 = DEFAULT_POWER
         motor2 = DEFAULT_POWER
         if left:
-            motor2 /= 2
+            motor2 = LOW_POWER
         if right:
-            motor1 /= 2
+            motor1 = LOW_POWER
     elif down:
         motor1 = -DEFAULT_POWER
         motor2 = -DEFAULT_POWER
         if left:
-            motor2 /= 2
+            motor2 = -LOW_POWER
         if right:
-            motor1 /= 2
+            motor1 = -LOW_POWER
     else:
         if left:
-            motor1 = DEFAULT_POWER / 2
-            motor2 = -DEFAULT_POWER / 2
+            motor1 = LOW_POWER
+            motor2 = -LOW_POWER
         if right:
-            motor1 = -DEFAULT_POWER / 2
-            motor2 = DEFAULT_POWER / 2
+            motor1 = -LOW_POWER
+            motor2 = LOW_POWER
     ret_dict = {'motor1': motor1, 'motor2': motor2}
     return ret_dict
 
@@ -85,11 +88,50 @@ def on_release(key):
         return False
 
 
+def deci_percent_input(arg_decipercent: str) -> int:
+    try:
+        result = int(arg_decipercent)
+    except Exception as ex:
+        raise ArgumentTypeError(f"Input is not a valid integer string -> {ex}")
+    if result < 0 or result > 1023:
+        raise ArgumentTypeError(
+            f"Input is not in valid range [0, 1023] -> {result}")
+    return result
+
+
+def process_args():
+    global LOW_POWER, DEFAULT_POWER, HOSTNAME
+    parser = ArgumentParser(
+        description='Simple esp32 robot controller with arrow keys')
+    parser.add_argument(
+        '--target', '-t', help='Target esp32 hostname or IP address')
+    parser.add_argument(
+        '--low-power', '-lp',
+        type=deci_percent_input,
+        default=LOW_POWER,
+        help='Deci percentage of motor power to use to send low power')
+    parser.add_argument(
+        '--default-power', '-dp',
+        type=deci_percent_input,
+        default=DEFAULT_POWER,
+        help='Deci percentage of motor power to use to send default power')
+    vargs = vars(parser.parse_args())
+    if 'target' in vargs:
+        HOSTNAME = vargs['target']
+    else:
+        HOSTNAME = input('enter esp32 hostname:')
+    if 'low_power' in vargs:
+        LOW_POWER = vargs['low_power']
+    if 'default_power' in vargs:
+        DEFAULT_POWER = vargs['default_power']
+
+
 def main():
-    global motors_ws
-    hostname = input('enter esp32 hostname:')
+    global motors_ws, HOSTNAME
+    process_args()
     motors_ws = websocket.WebSocket()
-    motors_ws.connect(f'ws://{hostname}/motors_ws', timeout=2)
+    motors_ws.connect(f'ws://{HOSTNAME}/motors_ws',
+                      timeout=2)
     print(f'Websockets connected: {motors_ws.getstatus()}')
 
     # ...or, in a non-blocking fashion:
