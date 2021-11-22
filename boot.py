@@ -20,6 +20,7 @@ from app import robot_set_power
 from app import print_status
 from app import print_help
 from app import robot_stop
+from app import get_pins_status
 
 from app import robot_backward as b
 from app import robot_forward as f
@@ -32,4 +33,5 @@ from app import robot_wait_1s as rw1
 from app import robot_wait_5s as rw5
 from app import execute_cmds as ec
 from app import robot_get_power as gp, robot_set_power as sp
+from app import get_pins_status as getpins
 from app import print_help as robot_help

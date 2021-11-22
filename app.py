@@ -138,7 +138,7 @@ def robot_wait_5s():
     time.sleep_ms(5000)
 
 
-def get_pin_status():
+def get_pins_status():
     global pins
     pin_str = '('
     for pin in pins:
@@ -157,7 +157,8 @@ valid_cmds = [robot_stop,
               robot_wait_1s,
               robot_wait_5s,
               robot_set_power,
-              robot_get_power
+              robot_get_power,
+              get_pins_status,
               ]
 
 valid_cmd_dict = {cmd.__name__: cmd for cmd in valid_cmds}
@@ -349,7 +350,7 @@ mws2.StartManaged()
 def prepare_status_string():
     global status_dict, in1, in2, in3, in4
     status_dict['mem_free'] = gc.mem_free()
-    status_dict['pin_str'] = get_pin_status()
+    status_dict['pin_str'] = get_pins_status()
     s = 'Uptime: {seconds: 5d}s\tpins:{pin_str}\tmem_free:{mem_free}'.format(
         **status_dict)
     return s
