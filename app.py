@@ -403,19 +403,42 @@ def init_heartbeat_timer():
 def print_help():
     print('# boot.py script defines easy-to-type shorthands for robot control')
     print('')
-    print('robot_backward as b')
-    print('robot_forward as f')
-    print('robot_rotate_left as rl')
-    print('robot_rotate_right as rr')
-    print('robot_turn_left as tl')
-    print('robot_turn_right as tr')
-    print('robot_wait as rw')
-    print('robot_wait_1s as rw1')
-    print('robot_wait_5s as rw5')
-    print('execute_cmds as ec')
-    print('print_status')
-    print('print_help')
-    print('print_help as robot_help')
+    print('''
+        robot_stop
+        robot_backward
+        robot_forward
+        robot_rotate_left
+        robot_rotate_right
+        robot_turn_left
+        robot_turn_right
+        robot_wait
+        robot_wait_1s
+        robot_wait_5s
+        execute_cmds
+        robot_get_power
+        robot_set_power
+        print_status
+        print_help
+        get_pins_status
+        get_motors_status
+
+        robot_stop as stop
+        robot_stop as rs
+        robot_backward as b
+        robot_forward as f
+        robot_rotate_left as rl
+        robot_rotate_right as rr
+        robot_turn_left as tl
+        robot_turn_right as tr
+        robot_wait as rw
+        robot_wait_1s as rw1
+        robot_wait_5s as rw5
+        execute_cmds as ec
+        robot_get_power as getpow, robot_set_power as setpow
+        get_pins_status as getpins
+        get_motors_status as getmotors
+        print_help as robot_help
+    ''')
     print('')
     print('# You can issue multiple commands like below:')
     print('f(), rl(), rl(), rl(), b(), b()')
