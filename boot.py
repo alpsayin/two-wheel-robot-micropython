@@ -19,7 +19,6 @@ from app import robot_get_power
 from app import robot_set_power
 from app import print_status
 from app import print_help
-from app import robot_stop
 from app import get_pins_status
 from app import get_motors_status
 
