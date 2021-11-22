@@ -12,6 +12,7 @@ BOOT_TIME = const(3)
 HEARTBEAT_PERIOD = const(5)  # s
 DEFAULT_MOTION_DURATION_MS = const(500)  # ms
 DEFAULT_ROTATE_DURATION_MS = const(200)  # ms
+MOTOR_DUTY_FREQ = const(20)  # Hz
 
 import repl_drop
 repl_drop.wait(BOOT_TIME)
@@ -27,13 +28,13 @@ DHCP_HOSTNAME = 'alpo'
 
 # motor control pins
 pin1 = Pin(25, Pin.OUT)
-in1 = PWM(pin1, freq=10, duty=0)
+in1 = PWM(pin1, freq=MOTOR_DUTY_FREQ, duty=0)
 pin2 = Pin(26, Pin.OUT)
-in2 = PWM(pin2, freq=10, duty=0)
+in2 = PWM(pin2, freq=MOTOR_DUTY_FREQ, duty=0)
 pin3 = Pin(27, Pin.OUT)
-in3 = PWM(pin3, freq=10, duty=0)
+in3 = PWM(pin3, freq=MOTOR_DUTY_FREQ, duty=0)
 pin4 = Pin(14, Pin.OUT)
-in4 = PWM(pin4, freq=10, duty=0)
+in4 = PWM(pin4, freq=MOTOR_DUTY_FREQ, duty=0)
 pins = [in1, in2, in3, in4]
 power_level = 1000  # max is 1023 but we can happily treat this as decipercent
 cmd_queue = []
