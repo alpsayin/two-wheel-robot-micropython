@@ -220,14 +220,13 @@ _wsLock = allocate_lock()
 
 
 def websocket_on_recv_text(webSocket, msg):
-    print('WebSocket text message: %s' % msg)
-    webSocket.SendTextMessage('Received "%s"' % msg)
+    pass
 
 # ------------------------------------------------------------------------
 
 
 def websocket_on_recv_binary(webSocket, msg):
-    print('WebSocket binary message: %s' % msg)
+    pass
 
 # ------------------------------------------------------------------------
 
