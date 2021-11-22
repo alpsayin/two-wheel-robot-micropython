@@ -458,6 +458,7 @@ def main():
     main_init()
     try:
         while True:
+            machine.idle()  # wait until cpu wake
             # Periodic Heartbeat Task
             if heartbeat_timer_flag:
                 heartbeat_timer_flag = False
@@ -474,7 +475,6 @@ def main():
                         websocket.SendTextMessage(
                             '{"result":"%s"}' % str(result))
 
-            time.sleep(0.005)
     except KeyboardInterrupt:
         print('Caught CTRL-C')
         pass
