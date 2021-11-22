@@ -7,7 +7,7 @@ import wlan_wrapper
 from _thread import allocate_lock, start_new_thread
 import json
 
-
+DEVICE_FREQ = const(240 * 1000000)
 BOOT_TIME = const(3)
 HEARTBEAT_PERIOD = const(5)  # s
 DEFAULT_MOTION_DURATION_MS = const(500)  # ms
@@ -425,6 +425,9 @@ def print_help():
 
 def main_init():
     global status_dict
+
+    machine.freq(DEVICE_FREQ)
+
     init_gpio()
 
     print_help()
