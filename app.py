@@ -146,6 +146,21 @@ def get_pins_status():
     pin_str += ')'
     return pin_str
 
+
+def get_motors_status():
+    motor1 = 0
+    motor2 = 0
+    if in1.duty() == 0:
+        motor1 = -in2.duty()
+    else:
+        motor1 = in1.duty()
+    if in3.duty() == 0:
+        motor2 = -in3.duty()
+    else:
+        motor2 = in3.duty()
+    return json.dumps({'motor1': motor1, 'motor2': motor2})
+
+
 valid_cmds = [robot_stop,
               robot_forward,
               robot_backward,
@@ -159,6 +174,7 @@ valid_cmds = [robot_stop,
               robot_set_power,
               robot_get_power,
               get_pins_status,
+              get_motors_status,
               ]
 
 valid_cmd_dict = {cmd.__name__: cmd for cmd in valid_cmds}
