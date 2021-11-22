@@ -171,6 +171,8 @@ def websocket_on_accept(microWebSrv2, webSocket):
     print('   - Origin : %s' % webSocket.Request.Origin)
     if webSocket.Request.Path.lower() == '/controller_ws':
         controller_websocket_join(webSocket)
+    elif webSocket.Request.Path.lower() == '/motors_ws':
+        motors_websocket_join(webSocket)
     else:
         print('Uknown ws path: "%s"' % webSocket.Request.Path.lower())
         webSocket.OnTextMessage = websocket_on_recv_text
@@ -205,6 +207,8 @@ def websocket_on_close(webSocket):
 
 global controller_ws
 controller_ws = None
+global motors_ws
+motors_ws = None
 
 global _wsLock
 _wsLock = allocate_lock()
@@ -226,6 +230,28 @@ def controller_websocket_join(webSocket):
         else:
             webSocket.SendTextMessage('# REJECTED <%s:%s>' % addr)
             controller_ws.SendTextMessage('# REJECTED <%s:%s>' % addr)
+            webSocket.Close()
+            accepted = False
+    if accepted:
+        print('# ACCEPTED <%s:%s>' % addr)
+    else:
+        print('# REJECTED <%s:%s>' % addr)
+
+
+def motors_websocket_join(webSocket):
+    global motors_ws
+    webSocket.OnTextMessage = motors_websocket_on_recv_text
+    webSocket.OnClosed = websocket_on_close
+    addr = webSocket.Request.UserAddress
+    print('# Websocket join attempt from <%s:%s>' % addr)
+    accepted = True
+    with _wsLock:
+        if motors_ws is None:
+            motors_ws = webSocket
+            motors_ws.SendTextMessage('# HELLO <%s:%s>' % addr)
+        else:
+            webSocket.SendTextMessage('# REJECTED <%s:%s>' % addr)
+            motors_ws.SendTextMessage('# REJECTED <%s:%s>' % addr)
             webSocket.Close()
             accepted = False
     if accepted:
@@ -256,6 +282,40 @@ def controller_websocket_on_recv_text(webSocket, msg):
     print('%s(%s)' % (cmd.__name__, str(param), ))
 
 
+def motors_websocket_on_recv_text(webSocket, msg):
+    global in1, in2, in3, in4
+    json_data = json.loads(msg)
+    if 'motor1' not in json_data:
+        return
+    if 'motor2' not in json_data:
+        return
+    motor1 = 0
+    motor2 = 0
+    try:
+        motor1 = int(json_data['motor1'])
+        motor2 = int(json_data['motor2'])
+    except OSError:
+        webSocket.Close()
+        pass
+    if motor1 == 0:
+        in1.duty(0)
+        in2.duty(0)
+    elif motor1 > 0:
+        in1.duty(motor1)
+        in2.duty(0)
+    elif motor1 < 0:
+        in1.duty(0)
+        in2.duty(-motor1)
+    if motor2 == 0:
+        in3.duty(0)
+        in4.duty(0)
+    elif motor2 > 0:
+        in3.duty(motor2)
+        in4.duty(0)
+    elif motor2 < 0:
+        in3.duty(0)
+        in4.duty(-motor2)
+    print('%s,%s' % (str(motor1), str(motor2)))
 
 
 # ============================================================================
