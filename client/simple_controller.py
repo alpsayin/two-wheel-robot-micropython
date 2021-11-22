@@ -147,7 +147,7 @@ def main():
         try:
             time.sleep(0.1)
             motors_powers = compute_motor_speeds()
-            data_json_str = json.dumps(motors_powers)
+            data_json_str = json.dumps(motors_powers, separators=(',', ':'))
             print(f'{data_json_str}')
             motors_ws.send(data_json_str)
         except KeyboardInterrupt:
