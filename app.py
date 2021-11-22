@@ -203,6 +203,7 @@ def websocket_on_accept(microWebSrv2, webSocket):
         webSocket.OnTextMessage = websocket_on_recv_text
         webSocket.OnBinaryMessage = websocket_on_recv_binary
         webSocket.OnClosed = websocket_on_close
+        webSocket.Close()
 
 # ============================================================================
 # ============================================================================
