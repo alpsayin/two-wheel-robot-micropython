@@ -450,6 +450,7 @@ def main_init():
 
 def heartbeat_task():
     # print_status()
+    # TODO: flip a led here
     pass
 
 
