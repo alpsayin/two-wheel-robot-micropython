@@ -198,7 +198,12 @@ def websocket_on_recv_binary(webSocket, msg):
 
 
 def websocket_on_close(webSocket):
+    global controller_ws, motors_ws
     print('WebSocket %s:%s closed' % webSocket.Request.UserAddress)
+    if webSocket == controller_ws:
+        controller_ws = None
+    if webSocket == motors_ws:
+        motors_ws = None
 
 # ============================================================================
 # ============================================================================
