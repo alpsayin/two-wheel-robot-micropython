@@ -186,8 +186,8 @@ def execute_cmds(*cmds):
     for cmd in cmds:
         # print(cmd)
         if cmd in valid_cmds:
-            print('Queuing {}'.format(cmd.__name__))
-            cmd_queue.append((cmd, None, None))
+            print('Executing {}'.format(cmd.__name__))
+            cmd()
 
 
 def websocket_on_accept(microWebSrv2, webSocket):
