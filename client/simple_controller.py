@@ -44,7 +44,7 @@ def compute_motor_speeds():
         if right:
             motor1 = -LOW_POWER
             motor2 = LOW_POWER
-    ret_dict = {'motor1': motor1, 'motor2': motor2}
+    ret_dict = {'m1': motor1, 'm2': motor2}
     return ret_dict
 
 

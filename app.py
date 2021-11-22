@@ -159,7 +159,7 @@ def get_motors_status():
         motor2 = -in3.duty()
     else:
         motor2 = in3.duty()
-    return json.dumps({'motor1': motor1, 'motor2': motor2})
+    return json.dumps({'m1': motor1, 'm2': motor2})
 
 
 valid_cmds = [robot_stop,
@@ -312,15 +312,15 @@ def controller_websocket_on_recv_text(webSocket, msg):
 def motors_websocket_on_recv_text(webSocket, msg):
     global in1, in2, in3, in4
     json_data = json.loads(msg)
-    if 'motor1' not in json_data:
+    if 'm1' not in json_data:
         return
-    if 'motor2' not in json_data:
+    if 'm2' not in json_data:
         return
     motor1 = 0
     motor2 = 0
     try:
-        motor1 = int(json_data['motor1'])
-        motor2 = int(json_data['motor2'])
+        motor1 = int(json_data['m1'])
+        motor2 = int(json_data['m2'])
     except OSError:
         webSocket.Close()
         pass
