@@ -342,7 +342,7 @@ def motors_websocket_on_recv_text(webSocket, msg):
     elif motor2 < 0:
         in3.duty(0)
         in4.duty(-motor2)
-    print('%s,%s' % (str(motor1), str(motor2)))
+    # print('%s,%s' % (str(motor1), str(motor2)))
 
 
 # ============================================================================
