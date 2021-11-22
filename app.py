@@ -138,6 +138,14 @@ def robot_wait_5s():
     time.sleep_ms(5000)
 
 
+def get_pin_status():
+    global pins
+    pin_str = '('
+    for pin in pins:
+        pin_str = pin_str + '{}, '.format(pin.duty())
+    pin_str += ')'
+    return pin_str
+
 valid_cmds = [robot_stop,
               robot_forward,
               robot_backward,
@@ -336,14 +344,6 @@ mws2.SetEmbeddedConfig()
 # All pages not found will be redirected to the home '/',
 mws2.NotFoundURL = 'https://alpsayin.com'
 mws2.StartManaged()
-
-
-def get_pin_status():
-    global pins
-    pin_str = ''
-    for pin in pins:
-        pin_str = pin_str + '+{:.2f}'.format(pin.duty() / 1023.0)
-    return pin_str
 
 
 def prepare_status_string():
