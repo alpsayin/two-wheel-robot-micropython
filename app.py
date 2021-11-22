@@ -209,6 +209,15 @@ def websocket_on_accept(microWebSrv2, webSocket):
 # ============================================================================
 
 
+global controller_ws
+controller_ws = None
+global motors_ws
+motors_ws = None
+
+global _wsLock
+_wsLock = allocate_lock()
+
+
 def websocket_on_recv_text(webSocket, msg):
     print('WebSocket text message: %s' % msg)
     webSocket.SendTextMessage('Received "%s"' % msg)
@@ -229,19 +238,6 @@ def websocket_on_close(webSocket):
         controller_ws = None
     if webSocket == motors_ws:
         motors_ws = None
-
-# ============================================================================
-# ============================================================================
-# ============================================================================
-
-
-global controller_ws
-controller_ws = None
-global motors_ws
-motors_ws = None
-
-global _wsLock
-_wsLock = allocate_lock()
 
 # ------------------------------------------------------------------------
 
