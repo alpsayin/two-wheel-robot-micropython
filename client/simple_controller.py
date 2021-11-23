@@ -116,14 +116,12 @@ def process_args():
         default=DEFAULT_POWER,
         help='Deci percentage of motor power to use to send default power')
     vargs = vars(parser.parse_args())
-    if 'target' in vargs:
-        HOSTNAME = vargs['target']
-    else:
+    print(vargs)
+    HOSTNAME = vargs['target']
+    if not HOSTNAME:
         HOSTNAME = input('enter esp32 hostname:')
-    if 'low_power' in vargs:
-        LOW_POWER = vargs['low_power']
-    if 'default_power' in vargs:
-        DEFAULT_POWER = vargs['default_power']
+    LOW_POWER = vargs['low_power']
+    DEFAULT_POWER = vargs['default_power']
 
 
 def main():
