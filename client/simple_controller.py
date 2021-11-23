@@ -131,6 +131,7 @@ def main():
     motors_ws.connect(f'ws://{HOSTNAME}/motors_ws',
                       timeout=2)
     print(f'Websockets connected: {motors_ws.getstatus()}')
+    print(f'Welcome message = {motors_ws.recv()}')
 
     # ...or, in a non-blocking fashion:
     listener = keyboard.Listener(
