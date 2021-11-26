@@ -160,20 +160,20 @@ def robot_set_motor_powers(motor1: int, motor2: int):
         in1.duty(0)
         in2.duty(0)
     elif motor1 > 0:
-        in1.duty(motor1)
-        in2.duty(0)
-    elif motor1 < 0:
         in1.duty(0)
-        in2.duty(-motor1)
+        in2.duty(motor1)
+    elif motor1 < 0:
+        in1.duty(-motor1)
+        in2.duty(0)
     if motor2 == 0:
         in3.duty(0)
         in4.duty(0)
     elif motor2 > 0:
-        in3.duty(motor2)
-        in4.duty(0)
-    elif motor2 < 0:
         in3.duty(0)
-        in4.duty(-motor2)
+        in4.duty(motor2)
+    elif motor2 < 0:
+        in3.duty(-motor2)
+        in4.duty(0)
 
 
 def get_motors_status():
