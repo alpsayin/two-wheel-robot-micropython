@@ -5,7 +5,8 @@ import simplejson as json
 from argparse import ArgumentParser, ArgumentTypeError
 
 DEFAULT_POWER = 1000
-LOW_POWER = 500
+ROTATE_POWER = 500
+LOW_POWER = 250
 HOSTNAME = None
 
 motors_ws = None
@@ -39,11 +40,11 @@ def compute_motor_speeds():
             motor2 = -LOW_POWER
     else:
         if left:
-            motor1 = -LOW_POWER
-            motor2 = LOW_POWER
+            motor1 = -ROTATE_POWER
+            motor2 = ROTATE_POWER
         if right:
-            motor1 = LOW_POWER
-            motor2 = -LOW_POWER
+            motor1 = ROTATE_POWER
+            motor2 = -ROTATE_POWER
     ret_dict = {'m1': motor1, 'm2': motor2}
     return ret_dict
 
@@ -100,7 +101,7 @@ def deci_percent_input(arg_decipercent: str) -> int:
 
 
 def process_args():
-    global LOW_POWER, DEFAULT_POWER, HOSTNAME
+    global LOW_POWER, DEFAULT_POWER, ROTATE_POWER, HOSTNAME
     parser = ArgumentParser(
         description='Simple esp32 robot controller with arrow keys')
     parser.add_argument(
@@ -110,6 +111,11 @@ def process_args():
         type=deci_percent_input,
         default=LOW_POWER,
         help='Deci percentage of motor power to use to send low power')
+    parser.add_argument(
+        '--rotate-power', '-rp',
+        type=deci_percent_input,
+        default=ROTATE_POWER,
+        help='Deci percentage of motor power to use when sending rotate commands')
     parser.add_argument(
         '--default-power', '-dp',
         type=deci_percent_input,
