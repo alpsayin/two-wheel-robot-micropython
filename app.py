@@ -67,7 +67,7 @@ def robot_stop():
     in4.duty(0)
 
 
-def robot_forward(duration_ms=DEFAULT_MOTION_DURATION_MS):
+def robot_backward(duration_ms=DEFAULT_MOTION_DURATION_MS):
     in1.duty(power_level)
     in2.duty(0)
     in3.duty(power_level)
@@ -77,7 +77,7 @@ def robot_forward(duration_ms=DEFAULT_MOTION_DURATION_MS):
     robot_stop()
 
 
-def robot_backward(duration_ms=DEFAULT_MOTION_DURATION_MS):
+def robot_forward(duration_ms=DEFAULT_MOTION_DURATION_MS):
     in1.duty(0)
     in2.duty(power_level)
     in3.duty(0)
