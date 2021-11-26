@@ -5,7 +5,7 @@ from micropython import const
 import gc
 import wlan_wrapper
 import uart_wrapper
-from _thread import allocate_lock
+from _thread import allocate_lock, start_new_thread
 import json
 
 DEVICE_FREQ = const(240 * 1000000)
@@ -461,6 +461,27 @@ def print_help():
     print('')
 
 
+def WASD_robot_handler_task(read_period_ms=100):
+    global cmd_queue
+    while True:
+        time.sleep_ms(read_period_ms)
+        if uart_wrapper.is_bluetooth_connected():
+            while uart_wrapper.raw_uart.any():
+                single_char = uart_wrapper.raw_uart.read(1)
+                if single_char == b'w':
+                    # robot_forward(100)
+                    cmd_queue.append((robot_forward, 100, None))
+                if single_char == b's':
+                    # robot_backward(100)
+                    cmd_queue.append((robot_backward, 100, None))
+                if single_char == b'a':
+                    # robot_turn_left(100)
+                    cmd_queue.append((robot_turn_left, 100, None))
+                if single_char == b'd':
+                    # robot_turn_right(100)
+                    cmd_queue.append((robot_turn_right, 100, None))
+
+
 def main_init():
     global status_dict
 
@@ -496,6 +517,7 @@ def heartbeat_task():
 def main():
     global heartbeat_timer_flag, publish_timer_flag, status_dict, cmd_queue
     main_init()
+    start_new_thread(WASD_robot_handler_task, (100,))
     try:
         while True:
             machine.idle()  # wait until cpu wake
