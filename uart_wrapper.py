@@ -33,7 +33,7 @@ def is_bluetooth_connected():
 
 
 def init():
-    global raw_uart, baudrate
+    global raw_uart, baudrate, bt_state_pin
     raw_uart = UART(1, tx=TX_PIN, rx=RX_PIN)
     raw_uart.init(
         baudrate=baudrate,
@@ -48,4 +48,6 @@ def init():
         timeout_char=WRITE_WAIT
     )
     raw_uart.write('AT')
+    bt_state_pin.irq(lambda p: print('BT STATE =', is_bluetooth_connected()),
+                     trigger=Pin.IRQ_RISING | Pin.IRQ_FALLING)
     return raw_uart
