@@ -67,7 +67,8 @@ def robot_stop():
     in4.duty(0)
 
 
-def robot_forward(duration_ms=DEFAULT_MOTION_DURATION_MS):
+def robot_backward(duration_ms=DEFAULT_MOTION_DURATION_MS):
+    global power_level
     in1.duty(power_level)
     in2.duty(0)
     in3.duty(power_level)
@@ -77,7 +78,8 @@ def robot_forward(duration_ms=DEFAULT_MOTION_DURATION_MS):
     robot_stop()
 
 
-def robot_backward(duration_ms=DEFAULT_MOTION_DURATION_MS):
+def robot_forward(duration_ms=DEFAULT_MOTION_DURATION_MS):
+    global power_level
     in1.duty(0)
     in2.duty(power_level)
     in3.duty(0)
@@ -88,6 +90,7 @@ def robot_backward(duration_ms=DEFAULT_MOTION_DURATION_MS):
 
 
 def robot_rotate_right(duration_ms=DEFAULT_ROTATE_DURATION_MS):
+    global power_level
     in1.duty(0)
     in2.duty(power_level)
     in3.duty(power_level)
@@ -98,6 +101,7 @@ def robot_rotate_right(duration_ms=DEFAULT_ROTATE_DURATION_MS):
 
 
 def robot_rotate_left(duration_ms=DEFAULT_ROTATE_DURATION_MS):
+    global power_level
     in1.duty(power_level)
     in2.duty(0)
     in3.duty(0)
@@ -108,9 +112,10 @@ def robot_rotate_left(duration_ms=DEFAULT_ROTATE_DURATION_MS):
 
 
 def robot_turn_right(duration_ms=DEFAULT_ROTATE_DURATION_MS):
+    global power_level
     in1.duty(0)
-    in2.duty(0)
-    in3.duty(power_level)
+    in2.duty(power_level)
+    in3.duty(0)
     in4.duty(0)
     if duration_ms != -1:
         time.sleep_ms(duration_ms)
@@ -118,10 +123,11 @@ def robot_turn_right(duration_ms=DEFAULT_ROTATE_DURATION_MS):
 
 
 def robot_turn_left(duration_ms=DEFAULT_ROTATE_DURATION_MS):
-    in1.duty(power_level)
+    global power_level
+    in1.duty(0)
     in2.duty(0)
     in3.duty(0)
-    in4.duty(0)
+    in4.duty(power_level)
     if duration_ms != -1:
         time.sleep_ms(duration_ms)
     robot_stop()
@@ -146,6 +152,28 @@ def get_pins_status():
         pin_str = pin_str + '{}, '.format(pin.duty())
     pin_str += ')'
     return pin_str
+
+
+def robot_set_motor_powers(motor1: int, motor2: int):
+    global in1, in2, in3, in4
+    if motor1 == 0:
+        in1.duty(0)
+        in2.duty(0)
+    elif motor1 > 0:
+        in1.duty(0)
+        in2.duty(motor1)
+    elif motor1 < 0:
+        in1.duty(-motor1)
+        in2.duty(0)
+    if motor2 == 0:
+        in3.duty(0)
+        in4.duty(0)
+    elif motor2 > 0:
+        in3.duty(0)
+        in4.duty(motor2)
+    elif motor2 < 0:
+        in3.duty(-motor2)
+        in4.duty(0)
 
 
 def get_motors_status():
@@ -324,24 +352,7 @@ def motors_websocket_on_recv_text(webSocket, msg):
     except OSError:
         webSocket.Close()
         pass
-    if motor1 == 0:
-        in1.duty(0)
-        in2.duty(0)
-    elif motor1 > 0:
-        in1.duty(motor1)
-        in2.duty(0)
-    elif motor1 < 0:
-        in1.duty(0)
-        in2.duty(-motor1)
-    if motor2 == 0:
-        in3.duty(0)
-        in4.duty(0)
-    elif motor2 > 0:
-        in3.duty(motor2)
-        in4.duty(0)
-    elif motor2 < 0:
-        in3.duty(0)
-        in4.duty(-motor2)
+    robot_set_motor_powers(motor1, motor2)
     # print('%s,%s' % (str(motor1), str(motor2)))
 
 

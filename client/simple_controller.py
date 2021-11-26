@@ -27,23 +27,23 @@ def compute_motor_speeds():
         motor1 = DEFAULT_POWER
         motor2 = DEFAULT_POWER
         if left:
-            motor2 = LOW_POWER
-        if right:
             motor1 = LOW_POWER
+        if right:
+            motor2 = LOW_POWER
     elif down:
         motor1 = -DEFAULT_POWER
         motor2 = -DEFAULT_POWER
         if left:
-            motor2 = -LOW_POWER
-        if right:
             motor1 = -LOW_POWER
+        if right:
+            motor2 = -LOW_POWER
     else:
         if left:
-            motor1 = LOW_POWER
-            motor2 = -LOW_POWER
-        if right:
             motor1 = -LOW_POWER
             motor2 = LOW_POWER
+        if right:
+            motor1 = LOW_POWER
+            motor2 = -LOW_POWER
     ret_dict = {'m1': motor1, 'm2': motor2}
     return ret_dict
 
