@@ -4,6 +4,7 @@ from machine import Timer, Pin, PWM
 from micropython import const
 import gc
 import wlan_wrapper
+import uart_wrapper
 from _thread import allocate_lock
 import json
 
@@ -174,6 +175,8 @@ def robot_set_motor_powers(motor1: int, motor2: int):
     elif motor2 < 0:
         in3.duty(-motor2)
         in4.duty(0)
+    if uart_wrapper.is_bluetooth_connected():
+        uart_wrapper.raw_uart.write(get_pins_status()+'\n')
 
 
 def get_motors_status():
@@ -464,6 +467,8 @@ def main_init():
     machine.freq(DEVICE_FREQ)
 
     init_gpio()
+
+    uart_wrapper.init()
 
     print_help()
 
