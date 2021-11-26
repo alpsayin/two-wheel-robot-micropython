@@ -4,7 +4,7 @@ from machine import Timer, Pin, PWM
 from micropython import const
 import gc
 import wlan_wrapper
-from _thread import allocate_lock, start_new_thread
+from _thread import allocate_lock
 import json
 
 DEVICE_FREQ = const(240 * 1000000)
