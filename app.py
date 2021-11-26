@@ -114,8 +114,8 @@ def robot_rotate_left(duration_ms=DEFAULT_ROTATE_DURATION_MS):
 def robot_turn_right(duration_ms=DEFAULT_ROTATE_DURATION_MS):
     global power_level
     in1.duty(0)
-    in2.duty(0)
-    in3.duty(power_level)
+    in2.duty(power_level)
+    in3.duty(0)
     in4.duty(0)
     if duration_ms != -1:
         time.sleep_ms(duration_ms)
@@ -123,11 +123,11 @@ def robot_turn_right(duration_ms=DEFAULT_ROTATE_DURATION_MS):
 
 
 def robot_turn_left(duration_ms=DEFAULT_ROTATE_DURATION_MS):
-    in1.duty(power_level)
     global power_level
+    in1.duty(0)
     in2.duty(0)
     in3.duty(0)
-    in4.duty(0)
+    in4.duty(power_level)
     if duration_ms != -1:
         time.sleep_ms(duration_ms)
     robot_stop()
