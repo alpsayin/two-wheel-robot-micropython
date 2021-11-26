@@ -154,6 +154,28 @@ def get_pins_status():
     return pin_str
 
 
+def robot_set_motor_powers(motor1: int, motor2: int):
+    global in1, in2, in3, in4
+    if motor1 == 0:
+        in1.duty(0)
+        in2.duty(0)
+    elif motor1 > 0:
+        in1.duty(motor1)
+        in2.duty(0)
+    elif motor1 < 0:
+        in1.duty(0)
+        in2.duty(-motor1)
+    if motor2 == 0:
+        in3.duty(0)
+        in4.duty(0)
+    elif motor2 > 0:
+        in3.duty(motor2)
+        in4.duty(0)
+    elif motor2 < 0:
+        in3.duty(0)
+        in4.duty(-motor2)
+
+
 def get_motors_status():
     motor1 = 0
     motor2 = 0
@@ -330,24 +352,7 @@ def motors_websocket_on_recv_text(webSocket, msg):
     except OSError:
         webSocket.Close()
         pass
-    if motor1 == 0:
-        in1.duty(0)
-        in2.duty(0)
-    elif motor1 > 0:
-        in1.duty(motor1)
-        in2.duty(0)
-    elif motor1 < 0:
-        in1.duty(0)
-        in2.duty(-motor1)
-    if motor2 == 0:
-        in3.duty(0)
-        in4.duty(0)
-    elif motor2 > 0:
-        in3.duty(motor2)
-        in4.duty(0)
-    elif motor2 < 0:
-        in3.duty(0)
-        in4.duty(-motor2)
+    robot_set_motor_powers(motor1, motor2)
     # print('%s,%s' % (str(motor1), str(motor2)))
 
 
