@@ -47,7 +47,6 @@ def init():
         timeout=READ_TIMEOUT,
         timeout_char=WRITE_WAIT
     )
-    raw_uart.write('AT')
     bt_state_pin.irq(lambda p: print('BT STATE =', is_bluetooth_connected()),
                      trigger=Pin.IRQ_RISING | Pin.IRQ_FALLING)
     return raw_uart
