@@ -40,6 +40,10 @@ pins = [in1, in2, in3, in4]
 power_level = 1000  # max is 1023 but we can happily treat this as decipercent
 cmd_queue = []
 
+
+def get_pin_number(pin_instance):
+    return int(str(pin_instance)[4:-1])
+
 # status
 heartbeat_timer_flag = True
 heartbeat = Timer(-1)
