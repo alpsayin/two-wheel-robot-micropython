@@ -497,7 +497,7 @@ def main_init():
         WLAN_SSID,
         WLAN_KEY,
         DHCP_HOSTNAME,
-        timeout=None)
+        timeout=10)
 
     if(init_wlan_result):
         status_dict.update(hostname=wlan_wrapper.wlan.config('dhcp_hostname'))
