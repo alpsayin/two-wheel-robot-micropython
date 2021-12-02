@@ -1,6 +1,7 @@
 import machine
 from machine import UART, Pin
 from micropython import const
+import time
 
 TX_PIN = const(32)
 RX_PIN = const(33)
@@ -31,6 +32,15 @@ def is_bluetooth_connected():
     global bt_state_pin
     return bt_state_pin.value() == 1
 
+
+def is_bluetooth_connected_alternative():
+    global raw_uart
+    raw_uart.read()  # clear buffer
+    raw_uart.write('AT')
+    time.sleep(1)
+    response = raw_uart.read()
+    return response != b'OK'
+    
 
 def init():
     global raw_uart, baudrate, bt_state_pin
