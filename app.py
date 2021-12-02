@@ -264,6 +264,24 @@ def execute_cmds(*cmds):
             cmd()
 
 
+def _queue_cmd(cmd, param=None, webSocket=None):
+    cmd_queue.append((cmd, param, webSocket))
+
+
+def queue_cmd_str(cmd_str, param_str=None, webSocket=None):
+    if cmd_str not in valid_cmd_dict:
+        return
+    cmd = valid_cmd_dict[cmd_str]
+    param = None
+    if param_str is not None:
+        try:
+            param = int(param_str)
+        except OSError:
+            pass
+    _queue_cmd(cmd, param, webSocket)
+    print('%s(%s)' % (cmd.__name__, str(param), ))
+
+
 def websocket_on_accept(microWebSrv2, webSocket):
     print('Example WebSocket accepted:')
     print('   - User   : %s:%s' % webSocket.Request.UserAddress)
@@ -364,23 +382,13 @@ def motors_websocket_join(webSocket):
 
 def controller_websocket_on_recv_text(webSocket, msg):
     json_data = json.loads(msg)
-    cmd = None
-    param = None
+    cmd_str = None
+    param_str = None
     if 'cmd' not in json_data:
-        return
-    if json_data['cmd'] not in valid_cmd_dict:
-        return
-    cmd = valid_cmd_dict[json_data['cmd']]
-    param = None
+        cmd_str = json_data['cmd']
     if 'param' in json_data:
-        param = json_data['param']
-        if param is not None:
-            try:
-                param = int(param)
-            except OSError:
-                pass
-    cmd_queue.append((cmd, param, webSocket))
-    print('%s(%s)' % (cmd.__name__, str(param), ))
+        param_str = json_data['param']
+    queue_cmd_str(cmd_str, param_str, webSocket)
 
 
 def motors_websocket_on_recv_text(webSocket, msg):
