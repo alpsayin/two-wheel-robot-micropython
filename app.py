@@ -512,17 +512,15 @@ def WASD_robot_handler_task(read_period_ms=100):
             while uart_wrapper.raw_uart.any():
                 single_char = uart_wrapper.raw_uart.read(1)
                 if single_char == b'w':
-                    # robot_forward(100)
-                    cmd_queue.append((robot_forward, 100, None))
+                    robot_set_motor_powers(power_level, power_level)
                 if single_char == b's':
-                    # robot_backward(100)
-                    cmd_queue.append((robot_backward, 100, None))
+                    robot_set_motor_powers(-power_level, -power_level)
                 if single_char == b'a':
-                    # robot_turn_left(100)
-                    cmd_queue.append((robot_turn_left, 100, None))
+                    robot_set_motor_powers(int(power_level/4), power_level)
                 if single_char == b'd':
-                    # robot_turn_right(100)
-                    cmd_queue.append((robot_turn_right, 100, None))
+                    robot_set_motor_powers(power_level, int(power_level/4))
+                if single_char == b'h':
+                    robot_set_motor_powers(0, 0)
 
 
 def main_init():
