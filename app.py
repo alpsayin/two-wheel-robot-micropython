@@ -40,6 +40,49 @@ pins = [in1, in2, in3, in4]
 power_level = 1000  # max is 1023 but we can happily treat this as decipercent
 cmd_queue = []
 
+
+def get_pin_number(pin_instance):
+    return int(str(pin_instance)[4:-1])
+
+
+# microphone pins
+mic1 = Pin(13, Pin.IN)
+mic2 = Pin(34, Pin.IN)
+mic3 = Pin(39, Pin.IN)
+mic4 = Pin(36, Pin.IN)
+
+mics = [mic1, mic2, mic3, mic4]
+mic_timers = {}
+
+
+def init_mic_timers():
+    for idx, mic in enumerate(mics):
+        mic_timer = Timer(-idx)
+        mic_timer.init(period=1000, mode=Timer.ONE_SHOT,
+                       callback=lambda t: re_enable_mic_isr(t, mic))
+        mic_timers[get_pin_number(mic)] = mic_timer
+
+
+def re_enable_mic_isr(tim_instance, pin_instance):
+    pin_instance.irq(mic_isr, Pin.IRQ_FALLING)
+    print('Reenable {}'.format(pin_instance))
+
+
+def mic_isr(pin_instance):
+    pin_instance.irq(None)
+    mic_timer = mic_timers[get_pin_number(pin_instance)]
+    mic_timer.init(period=1000, mode=Timer.ONE_SHOT,
+                   callback=lambda t: re_enable_mic_isr(t, pin_instance))
+    print('Disable {}'.format(pin_instance))
+
+
+def set_mic_isrs():
+    mic1.irq(mic_isr, Pin.IRQ_FALLING)
+    mic2.irq(mic_isr, Pin.IRQ_FALLING)
+    mic3.irq(mic_isr, Pin.IRQ_FALLING)
+    mic4.irq(mic_isr, Pin.IRQ_FALLING)
+
+
 # status
 heartbeat_timer_flag = True
 heartbeat = Timer(-1)
@@ -176,7 +219,7 @@ def robot_set_motor_powers(motor1: int, motor2: int):
         in3.duty(-motor2)
         in4.duty(0)
     if uart_wrapper.is_bluetooth_connected():
-        uart_wrapper.raw_uart.write(get_pins_status()+'\n')
+        uart_wrapper.raw_uart.write(get_pins_status() + '\n')
 
 
 def get_motors_status():
@@ -469,17 +512,15 @@ def WASD_robot_handler_task(read_period_ms=100):
             while uart_wrapper.raw_uart.any():
                 single_char = uart_wrapper.raw_uart.read(1)
                 if single_char == b'w':
-                    # robot_forward(100)
-                    cmd_queue.append((robot_forward, 100, None))
+                    robot_set_motor_powers(power_level, power_level)
                 if single_char == b's':
-                    # robot_backward(100)
-                    cmd_queue.append((robot_backward, 100, None))
+                    robot_set_motor_powers(-power_level, -power_level)
                 if single_char == b'a':
-                    # robot_turn_left(100)
-                    cmd_queue.append((robot_turn_left, 100, None))
+                    robot_set_motor_powers(int(power_level/4), power_level)
                 if single_char == b'd':
-                    # robot_turn_right(100)
-                    cmd_queue.append((robot_turn_right, 100, None))
+                    robot_set_motor_powers(power_level, int(power_level/4))
+                if single_char == b'h':
+                    robot_set_motor_powers(0, 0)
 
 
 def main_init():
@@ -504,6 +545,9 @@ def main_init():
         print('Wifi initialised')
 
     init_heartbeat_timer()
+
+    init_mic_timers()
+    set_mic_isrs()
 
     print('\nPress CTRL-C to drop to REPL to control the robot with existing functions\n')  # noqa E501
 
