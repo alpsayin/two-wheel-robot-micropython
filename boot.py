@@ -4,37 +4,36 @@ import webrepl
 print('boot.py')
 webrepl.start()
 
-from app import robot_stop
-from app import robot_backward
-from app import robot_forward
-from app import robot_rotate_left
-from app import robot_rotate_right
-from app import robot_turn_left
-from app import robot_turn_right
-from app import robot_wait
-from app import robot_wait_1s
-from app import robot_wait_5s
-from app import execute_cmds
-from app import robot_get_power
-from app import robot_set_power
+from robot import stop
+from robot import backward
+from robot import forward
+from robot import rotate_left
+from robot import rotate_right
+from robot import turn_left
+from robot import turn_right
+from robot import wait
+from robot import wait_1s
+from robot import wait_5s
+from robot import execute_cmds
+from robot import get_power
+from robot import set_power
 from app import print_status
 from app import print_help
-from app import get_pins_status
-from app import get_motors_status
+from robot import get_pins_status
+from robot import get_motors_status
 
-from app import robot_stop as stop
-from app import robot_stop as rs
-from app import robot_backward as b
-from app import robot_forward as f
-from app import robot_rotate_left as rl
-from app import robot_rotate_right as rr
-from app import robot_turn_left as tl
-from app import robot_turn_right as tr
-from app import robot_wait as rw
-from app import robot_wait_1s as rw1
-from app import robot_wait_5s as rw5
-from app import execute_cmds as ec
-from app import robot_get_power as getpow, robot_set_power as setpow
-from app import get_pins_status as getpins
-from app import get_motors_status as getmotors
+from robot import stop as rs
+from robot import backward as b
+from robot import forward as f
+from robot import rotate_left as rl
+from robot import rotate_right as rr
+from robot import turn_left as tl
+from robot import turn_right as tr
+from robot import wait as rw
+from robot import wait_1s as rw1
+from robot import wait_5s as rw5
+from robot import execute_cmds as ec
+from robot import get_power as getpow, set_power as setpow
+from robot import get_pins_status as getpins
+from robot import get_motors_status as getmotors
 from app import print_help as robot_help
