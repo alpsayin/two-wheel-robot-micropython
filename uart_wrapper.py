@@ -18,7 +18,7 @@ WRITE_WAIT = 0
 
 raw_uart = None
 baudrate = DEFAULT_BAUDRATE
-bt_state_pin = Pin(35, Pin.IN)
+bt_state_pin = Pin(STATE_PIN, Pin.IN)
 
 
 def update_baudrate(new_baudrate):
