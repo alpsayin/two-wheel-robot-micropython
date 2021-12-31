@@ -67,3 +67,10 @@ class MicrophoneArray(object):
 def init_mic_experiments():
     global mics, mic_array
     mic_array = MicrophoneArray(mics)
+
+
+def deinit_mic_experiments():
+    global mics, mic_array
+    mic_array.timer.deinit()
+    for mic in mics:
+        mic.irq(None)
