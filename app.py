@@ -25,7 +25,7 @@ import repl_drop
 repl_drop.wait(BOOT_TIME)
 print('app.py')
 
-import robot_websocket_server
+# import robot_websocket_server
 
 # wifi
 # make sure you have a credentials.py file which defines the below variables
@@ -151,15 +151,15 @@ def main_init():
 
     print_help()
 
-    init_wlan_result = wlan_wrapper.init_wifi(
-        WLAN_SSID,
-        WLAN_KEY,
-        DHCP_HOSTNAME,
-        timeout=10)
+    # init_wlan_result = wlan_wrapper.init_wifi(
+    #     WLAN_SSID,
+    #     WLAN_KEY,
+    #     DHCP_HOSTNAME,
+    #     timeout=10)
 
-    if(init_wlan_result):
-        status_dict.update(hostname=wlan_wrapper.wlan.config('dhcp_hostname'))
-        print('Wifi initialised')
+    # if(init_wlan_result):
+    #     status_dict.update(hostname=wlan_wrapper.wlan.config('dhcp_hostname'))
+    #     print('Wifi initialised')
 
     init_heartbeat_timer()
 

@@ -1,8 +1,8 @@
 from machine import reset  # noqa F401
-import webrepl
+# import webrepl
 
 print('boot.py')
-webrepl.start()
+# webrepl.start()
 
 from robot import stop
 from robot import backward
